@@ -53,7 +53,72 @@ init =
 
 gameState : Grid -> GameState
 gameState grid =
-    InProgress
+    case (List.filter isThreeInARow <| getAllLines grid) of
+        [ [ X, X, X ] ] ->
+            Won PlayerX
+
+        [ [ O, O, O ] ] ->
+            Won PlayerO
+
+        _ ->
+            if (any squareIsEmpty grid) then
+                InProgress
+            else
+                Won Cat
+
+
+getAllLines : Grid -> List (List Square)
+getAllLines grid =
+    let
+        diag1 =
+            [ (getSquareAt 0 grid)
+            , (getSquareAt 4 grid)
+            , (getSquareAt 8 grid)
+            ]
+
+        diag2 =
+            [ (getSquareAt 2 grid)
+            , (getSquareAt 4 grid)
+            , (getSquareAt 6 grid)
+            ]
+
+        rows =
+            groupsOf 3 grid
+
+        cols =
+            transpose rows
+    in
+        [ diag1, diag2 ] ++ rows ++ cols
+
+
+getSquareAt : Int -> Grid -> Square
+getSquareAt index grid =
+    case getAt index grid of
+        Just sq ->
+            sq
+
+        Nothing ->
+            Empty
+
+
+isThreeInARow : List Square -> Bool
+isThreeInARow line =
+    case line of
+        [ a, b, c ] ->
+            (a /= Empty) && (a == b) && (b == c)
+
+        _ ->
+            False
+
+
+squareIsEmpty : Square -> Bool
+squareIsEmpty square =
+    case square of
+        Empty ->
+            True
+
+        _ ->
+            False
 
 
 view : Model -> Html Msg

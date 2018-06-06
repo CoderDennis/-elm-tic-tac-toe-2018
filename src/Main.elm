@@ -32,6 +32,7 @@ type alias Model =
 
 type Msg
     = Select Int Int
+    | Reset
 
 
 type GameState
@@ -134,8 +135,15 @@ view model =
             , y "30"
             , fontFamily "Verdana"
             , fontSize "35"
+            , onClick Reset
             ]
-            [ text <| toString model.player ]
+            [ case gameState model.grid of
+                InProgress ->
+                    text <| toString model.player
+
+                Won player ->
+                    text <| (toString player) ++ " Won!"
+            ]
         , g [ transform "translate(0,50)" ]
             [ viewLines
             , viewGrid model.grid
@@ -223,6 +231,9 @@ update msg model =
                     setAt (row * 3 + col) square model.grid
             in
                 { model | grid = newGrid, player = nextPlayer }
+
+        Reset ->
+            init
 
 
 main =
